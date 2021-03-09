@@ -1,2 +1,6 @@
 User-agent: *
 Disallow:
+
+# Group 1
+User-agent: Googlebot
+Disallow: /nogooglebot/

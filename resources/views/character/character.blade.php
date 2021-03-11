@@ -71,7 +71,7 @@
         @endif
     </div>
 </div>
-
+@comments([ 'model' => $character, 'perPage' => 20 ])
 @endsection
 
 @section('scripts')

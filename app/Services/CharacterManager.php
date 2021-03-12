@@ -91,11 +91,7 @@ class CharacterManager extends Service
         try {
             if(!$isMyo && Character::where('slug', $data['slug'])->exists()) throw new \Exception("Please enter a unique character code.");
 
-<<<<<<< HEAD
-            if(!(isset($data['user_id']) && $data['user_id']) && !(isset($data['owner_url']) && $data['owner_url']))
-=======
             if(!(isset($data['user_id']) && $data['user_id']) && !(isset($data['owner_alias']) && $data['owner_alias']) && !(isset($data['parent_id']) && $data['parent_id'])) 
->>>>>>> b65c678219c1e561d5e4708bde475ce5cefc3ff6
                 throw new \Exception("Please select an owner.");
             if(!$isMyo)
             {

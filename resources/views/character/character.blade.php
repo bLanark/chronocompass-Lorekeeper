@@ -5,16 +5,25 @@
 @section('meta-img') {{ $character->image->thumbnailUrl }} @endsection
 
 @section('profile-content')
-{!! breadcrumbs([($character->is_myo_slot ? 'MYO Slot Masterlist' : 'Character Masterlist') => ($character->is_myo_slot ? 'myos' : 'masterlist'), $character->fullName => $character->url]) !!}
+@if($character->is_myo_slot)
+{!! breadcrumbs(['MYO Slot Masterlist' => 'myos', $character->fullName => $character->url]) !!}
+@else
+{!! breadcrumbs([($character->category->masterlist_sub_id ? $character->category->sublist->name.' Masterlist' : 'Character masterlist') => ($character->category->masterlist_sub_id ? 'sublist/'.$character->category->sublist->key : 'masterlist' ), $character->fullName => $character->url]) !!}
+@endif
 
 @include('character._header', ['character' => $character])
 
 {{-- Main Image --}}
 <div class="row mb-3">
-    <div class="text-center col-md-7">
-        <a href="{{ $character->image->imageUrl }}" data-lightbox="entry" data-title="{{ $character->fullName }}">
-            <img src="{{ $character->image->imageUrl }}" class="image" />
-        </a>
+    <div class="col-md-7">
+        <div class="text-center">
+            <a href="{{ $character->image->canViewFull(Auth::check() ? Auth::user() : null) && file_exists( public_path($character->image->imageDirectory.'/'.$character->image->fullsizeFileName)) ? $character->image->fullsizeUrl : $character->image->imageUrl }}" data-lightbox="entry" data-title="{{ $character->fullName }}">
+            <img src="{{ $character->image->canViewFull(Auth::check() ? Auth::user() : null) && file_exists( public_path($character->image->imageDirectory.'/'.$character->image->fullsizeFileName)) ? $character->image->fullsizeUrl : $character->image->imageUrl }}" class="image" />
+            </a>
+        </div>
+        @if($character->image->canViewFull(Auth::check() ? Auth::user() : null) && file_exists( public_path($character->image->imageDirectory.'/'.$character->image->fullsizeFileName)))
+            <div class="text-right">You are viewing the full-size image. <a href="{{ $character->image->imageUrl }}">View watermarked image</a>?</div>
+        @endif
     </div>
     @include('character._image_info', ['image' => $character->image])
 </div>
@@ -29,6 +38,11 @@
             <li class="nav-item">
                 <a class="nav-link" id="notesTab" data-toggle="tab" href="#notes" role="tab">Description</a>
             </li>
+            @if($character->getLineageBlacklistLevel() < 2)
+                <li class="nav-item">
+                    <a class="nav-link" id="lineageTab" data-toggle="tab" href="#lineage" role="tab">Lineage</a>
+                </li>
+            @endif
             @if(Auth::check() && Auth::user()->hasPower('manage_characters'))
                 <li class="nav-item">
                     <a class="nav-link" id="settingsTab" data-toggle="tab" href="#settings-{{ $character->slug }}" role="tab"><i class="fas fa-cog"></i></a>
@@ -43,6 +57,11 @@
         <div class="tab-pane fade" id="notes">
             @include('character._tab_notes', ['character' => $character])
         </div>
+        @if($character->getLineageBlacklistLevel() < 2)
+            <div class="tab-pane fade" id="lineage">
+                @include('character._tab_lineage', ['character' => $character])
+            </div>
+        @endif
         @if(Auth::check() && Auth::user()->hasPower('manage_characters'))
             <div class="tab-pane fade" id="settings-{{ $character->slug }}">
                 {!! Form::open(['url' => $character->is_myo_slot ? 'admin/myo/'.$character->id.'/settings' : 'admin/character/'.$character->slug.'/settings']) !!}

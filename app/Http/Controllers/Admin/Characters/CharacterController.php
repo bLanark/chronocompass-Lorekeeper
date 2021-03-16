@@ -10,6 +10,7 @@ use Settings;
 
 use App\Models\Character\Character;
 use App\Models\Character\CharacterCategory;
+use App\Models\Character\CharacterLineageBlacklist;
 use App\Models\Rarity;
 use App\Models\User\User;
 use App\Models\Species\Species;
@@ -17,6 +18,7 @@ use App\Models\Species\Subtype;
 use App\Models\Feature\Feature;
 use App\Models\Character\CharacterTransfer;
 use App\Models\Trade;
+use App\Models\User\UserItem;
 
 use App\Services\CharacterManager;
 use App\Services\CurrencyManager;
@@ -57,6 +59,7 @@ class CharacterController extends Controller
         return view('admin.masterlist.create_character', [
             'categories' => CharacterCategory::orderBy('sort')->get(),
             'userOptions' => User::query()->orderBy('name')->pluck('name', 'id')->toArray(),
+            'characterOptions' => CharacterLineageBlacklist::getAncestorOptions(),
             'rarities' => ['0' => 'Select Rarity'] + Rarity::orderBy('sort', 'DESC')->pluck('name', 'id')->toArray(),
             'specieses' => ['0' => 'Select Species'] + Species::orderBy('sort', 'DESC')->pluck('name', 'id')->toArray(),
             'subtypes' => ['0' => 'Pick a Species First'],
@@ -74,6 +77,7 @@ class CharacterController extends Controller
     {
         return view('admin.masterlist.create_character', [
             'userOptions' => User::query()->orderBy('name')->pluck('name', 'id')->toArray(),
+            'characterOptions' => CharacterLineageBlacklist::getAncestorOptions(),
             'rarities' => ['0' => 'Select Rarity'] + Rarity::orderBy('sort', 'DESC')->pluck('name', 'id')->toArray(),
             'specieses' => ['0' => 'Select Species'] + Species::orderBy('sort', 'DESC')->pluck('name', 'id')->toArray(),
             'subtypes' => ['0' => 'Pick a Species First'],
@@ -113,6 +117,24 @@ class CharacterController extends Controller
             'x0', 'x1', 'y0', 'y1',
             'designer_alias', 'designer_url',
             'artist_alias', 'artist_url',
+
+            // hello darkness my old friend //
+            'sire_id',           'sire_name',
+            'sire_sire_id',      'sire_sire_name',
+            'sire_sire_sire_id', 'sire_sire_sire_name',
+            'sire_sire_dam_id',  'sire_sire_dam_name',
+            'sire_dam_id',       'sire_dam_name',
+            'sire_dam_sire_id',  'sire_dam_sire_name',
+            'sire_dam_dam_id',   'sire_dam_dam_name',
+            'dam_id',            'dam_name',
+            'dam_sire_id',       'dam_sire_name',
+            'dam_sire_sire_id',  'dam_sire_sire_name',
+            'dam_sire_dam_id',   'dam_sire_dam_name',
+            'dam_dam_id',        'dam_dam_name',
+            'dam_dam_sire_id',   'dam_dam_sire_name',
+            'dam_dam_dam_id',    'dam_dam_dam_name',
+            'generate_ancestors',
+
             'species_id', 'subtype_id', 'rarity_id', 'feature_id', 'feature_data',
             'image', 'thumbnail', 'image_description'
         ]);
@@ -143,6 +165,24 @@ class CharacterController extends Controller
             'x0', 'x1', 'y0', 'y1',
             'designer_alias', 'designer_url',
             'artist_alias', 'artist_url',
+
+            // i've come to speak with you again //
+            'sire_id',           'sire_name',
+            'sire_sire_id',      'sire_sire_name',
+            'sire_sire_sire_id', 'sire_sire_sire_name',
+            'sire_sire_dam_id',  'sire_sire_dam_name',
+            'sire_dam_id',       'sire_dam_name',
+            'sire_dam_sire_id',  'sire_dam_sire_name',
+            'sire_dam_dam_id',   'sire_dam_dam_name',
+            'dam_id',            'dam_name',
+            'dam_sire_id',       'dam_sire_name',
+            'dam_sire_sire_id',  'dam_sire_sire_name',
+            'dam_sire_dam_id',   'dam_sire_dam_name',
+            'dam_dam_id',        'dam_dam_name',
+            'dam_dam_sire_id',   'dam_dam_sire_name',
+            'dam_dam_dam_id',    'dam_dam_dam_name',
+            'generate_ancestors',
+
             'species_id', 'subtype_id', 'rarity_id', 'feature_id', 'feature_data',
             'image', 'thumbnail'
         ]);
@@ -597,12 +637,30 @@ class CharacterController extends Controller
 
         $openTransfersQueue = Settings::get('open_transfers_queue');
 
+        $stacks = array();
+        foreach($trades->get() as $trade) {
+            foreach($trade->data as $side=>$assets) {
+                if(isset($assets['user_items'])) {
+                    $user_items = UserItem::with('item')->find(array_keys($assets['user_items']));
+                    $items = array();
+                    foreach($assets['user_items'] as $id=>$quantity) {
+                        $user_item = $user_items->find($id);
+                        $user_item['quantity'] = $quantity;
+                        array_push($items,$user_item);
+                    }
+                    $items = collect($items)->groupBy('item_id');
+                    $stacks[$trade->id][$side] = $items;
+                }
+            }
+        }
+        
         return view('admin.masterlist.character_trades', [
             'trades' => $trades->orderBy('id', 'DESC')->paginate(20),
             'tradesQueue' => Settings::get('open_transfers_queue'),
             'openTransfersQueue' => $openTransfersQueue,
             'transferCount' => $openTransfersQueue ? CharacterTransfer::active()->where('is_approved', 0)->count() : 0,
-            'tradeCount' => $openTransfersQueue ? Trade::where('status', 'Pending')->count() : 0
+            'tradeCount' => $openTransfersQueue ? Trade::where('status', 'Pending')->count() : 0,
+            'stacks' => $stacks
         ]);
     }
 

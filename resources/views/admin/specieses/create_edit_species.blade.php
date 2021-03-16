@@ -21,6 +21,11 @@
 </div>
 
 <div class="form-group">
+    {!! Form::label('Sub Masterlist (Optional)') !!} {!! add_help('This puts it onto a sub masterlist.') !!}
+    {!! Form::select('masterlist_sub_id', $sublists, $species->masterlist_sub_id, ['class' => 'form-control']) !!}
+</div>
+
+<div class="form-group">
     {!! Form::label('World Page Image (Optional)') !!} {!! add_help('This image is used only on the world information pages.') !!}
     <div>{!! Form::file('image') !!}</div>
     <div class="text-muted">Recommended size: 200px x 200px</div>
@@ -36,6 +41,11 @@
     {!! Form::label('Description (Optional)') !!}
     {!! Form::textarea('description', $species->description, ['class' => 'form-control wysiwyg']) !!}
 </div>
+
+@include('admin.lineage._edit_lineage_blacklist', [
+    'lineageBlacklist' => $lineageBlacklist,
+    'type' => 'species'
+])
 
 <div class="text-right">
     {!! Form::submit($species->id ? 'Edit' : 'Create', ['class' => 'btn btn-primary']) !!}

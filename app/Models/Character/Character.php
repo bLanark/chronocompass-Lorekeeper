@@ -10,13 +10,22 @@ use App\Models\Model;
 
 use App\Models\User\User;
 use App\Models\User\UserCharacterLog;
+
 use App\Models\Character\Character;
 use App\Models\Character\CharacterCategory;
-use App\Models\Character\CharacterCurrency;
 use App\Models\Character\CharacterTransfer;
 use App\Models\Character\CharacterBookmark;
+use App\Models\Character\CharacterLineage;
+use App\Models\Character\CharacterLineageBlacklist;
+
+use App\Models\Character\CharacterCurrency;
 use App\Models\Currency\Currency;
 use App\Models\Currency\CurrencyLog;
+
+use App\Models\Character\CharacterItem;
+use App\Models\Item\Item;
+use App\Models\Item\ItemLog;
+
 use App\Models\Submission\Submission;
 use App\Models\Submission\SubmissionCharacter;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -184,8 +193,24 @@ class Character extends Model
         return $this->belongsTo('App\Models\Rarity', 'rarity_id');
     }
 
+    /**
+     * Get the character's items.
+     */
+    public function items()
+    {
+        return $this->belongsToMany('App\Models\Item\Item', 'character_items')->withPivot('count', 'data', 'updated_at', 'id')->whereNull('character_items.deleted_at');
+    }
+
+    /**
+     * Get the lineage of the character.
+     */
+    public function lineage()
+    {
+        return $this->hasOne('App\Models\Character\CharacterLineage', 'character_id');
+    }
+
     /**********************************************************************************************
-    
+
         SCOPES
 
     **********************************************************************************************/
@@ -419,6 +444,26 @@ class Character extends Model
     }
 
     /**
+     * Get the character's item logs.
+     *
+     * @param  int  $limit
+     * @return \Illuminate\Support\Collection|\Illuminate\Pagination\LengthAwarePaginator
+     */
+    public function getItemLogs($limit = 10)
+    {
+        $character = $this;
+
+        $query = ItemLog::with('item')->where(function($query) use ($character) {
+            $query->with('sender.rank')->where('sender_type', 'Character')->where('sender_id', $character->id)->where('log_type', '!=', 'Staff Grant');
+        })->orWhere(function($query) use ($character) {
+            $query->with('recipient.rank')->where('recipient_type', 'Character')->where('recipient_id', $character->id)->where('log_type', '!=', 'Staff Removal');
+        })->orderBy('id', 'DESC');
+
+        if($limit) return $query->take($limit)->get();
+        else return $query->paginate(30);
+    }
+
+    /**
      * Get the character's ownership logs.
      *
      * @return \Illuminate\Pagination\LengthAwarePaginator
@@ -500,6 +545,19 @@ class Character extends Model
                     'character_url' => $this->url,
                     'character_name' => $this->fullName
                 ]);
-        }        
+        }
+    }
+
+    /**
+     * Finds the lineage blacklist level of this character.
+     * 0 is no restriction at all
+     * 1 is no ancestors but no children
+     * 2 is no lineage at all
+     *
+     * @return int
+     */
+    public function getLineageBlacklistLevel($maxLevel = 2)
+    {
+        return CharacterLineageBlacklist::getBlacklistLevel($this, $maxLevel);
     }
 }

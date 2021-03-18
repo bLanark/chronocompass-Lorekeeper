@@ -15,10 +15,7 @@ use App\Models\Item\Item;
 use App\Models\Item\ItemCategory;
 use App\Models\Award\Award;
 use App\Models\Award\AwardCategory;
-use App\Models\Character\Character;
-use App\Models\Item\Item;
 use App\Models\Raffle\Raffle;
-use App\Models\Item\ItemCategory;
 use App\Models\Currency\Currency;
 use App\Models\Submission\Submission;
 use App\Models\Submission\SubmissionCharacter;
@@ -236,7 +233,7 @@ class SubmissionController extends Controller
             'items' => Item::orderBy('name')->released()->pluck('name', 'id'),
             'currencies' => Currency::where('is_user_owned', 1)->orderBy('name')->pluck('name', 'id'),
             'raffles' => Raffle::where('rolled_at', null)->where('is_active', 1)->orderBy('name')->pluck('name', 'id'),
-            'awards' => Award::orderBy('name')->pluck('name', 'id')
+            'awards' => Award::orderBy('name')->pluck('name', 'id'),
             'recipes'=> Recipe::orderBy('name')->pluck('name', 'id'),
             'page' => 'submission'
         ]));

@@ -147,6 +147,7 @@ Route::get('event-tracking', 'PromptsController@getEventTracking');
 **************************************************************************************************/
 Route::get('credits', 'PageController@getCreditsPage');
 Route::get('info/{key}', 'PageController@getPage');
+Route::get('world/info/{key}', 'PageController@getPageSection');
 
 /**************************************************************************************************
     Raffles

@@ -47,6 +47,11 @@
     {!! Form::textarea('description', $category->description, ['class' => 'form-control wysiwyg']) !!}
 </div>
 
+@include('admin.lineage._edit_lineage_blacklist', [
+    'lineageBlacklist' => $lineageBlacklist,
+    'type' => 'category'
+])
+
 <div class="text-right">
     {!! Form::submit($category->id ? 'Edit' : 'Create', ['class' => 'btn btn-primary']) !!}
 </div>
@@ -67,12 +72,12 @@
 @section('scripts')
 @parent
 <script>
-$( document ).ready(function() {    
+$( document ).ready(function() {
     $('.delete-category-button').on('click', function(e) {
         e.preventDefault();
         loadModal("{{ url('admin/data/character-categories/delete') }}/{{ $category->id }}", 'Delete Category');
     });
 });
-    
+
 </script>
 @endsection

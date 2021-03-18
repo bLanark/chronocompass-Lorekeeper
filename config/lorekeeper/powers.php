@@ -54,7 +54,11 @@ return [
     'manage_reports' => [
         'name' => 'Manage Reports',
         'description' => 'Allow rank to view the reports queue.'
-    ]
+    ],
+    'manage_affiliates' => [
+        'name' => 'Manage Affiliates',
+        'description' => 'Allow rank to view affiliate request queue, manage them, or even create new affiliates.'
+    ],
 
 
 

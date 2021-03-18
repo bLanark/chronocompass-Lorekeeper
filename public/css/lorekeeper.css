@@ -634,3 +634,6 @@ tr.accountbound {
 .recipe-image {
     width: 150px;
 }
+
+.overflow-auto {overflow:auto;}
+

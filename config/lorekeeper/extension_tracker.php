@@ -11,7 +11,6 @@ return [
     //     ]),
     //     'version' => '1.0.0',
     // ],
-<<<<<<< HEAD
     'crafting_system' => [
         'key' => 'crafting_system',
         'wiki_key' => 'Crafting_System',
@@ -31,9 +30,6 @@ return [
         ]),
         'version' => '1.2.0',
     ],
-
-=======
-
     'event_tools' => [
         'key' => 'event_tools',
         'wiki_key' => 'event_tools',
@@ -41,7 +37,5 @@ return [
             'Mercury' => 'https://github.com/itinerare/',
         ]),
         'version' => '1.0.0',
-    ]
-
->>>>>>> event/master
+    ],
 ];

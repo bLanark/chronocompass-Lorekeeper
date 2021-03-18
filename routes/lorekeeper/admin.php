@@ -317,6 +317,11 @@ Route::group(['prefix' => 'grants', 'namespace' => 'Users', 'middleware' => 'pow
 
     Route::get('recipes', 'GrantController@getRecipes');
     Route::post('recipes', 'GrantController@postRecipes');
+
+    Route::get('event-currency', 'GrantController@getEventCurrency');
+    Route::get('event-currency/clear', 'GrantController@getClearEventCurrency');
+    Route::post('event-currency/clear', 'GrantController@postClearEventCurrency');
+
 });
 
 # AWARD GRANTS

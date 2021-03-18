@@ -95,12 +95,17 @@ return [
                 'url' => 'admin/grants/items'
             ],
             [
+
                 'name' => 'Award Grants',
                 'url' => 'admin/grants/awards'
 	    ],
 	    [
                 'name' => 'Recipe Grants',
                 'url' => 'admin/grants/recipes'
+
+                'name' => 'Event Currency',
+                'url' => 'admin/grants/event-currency'
+
             ],
         ]
     ],

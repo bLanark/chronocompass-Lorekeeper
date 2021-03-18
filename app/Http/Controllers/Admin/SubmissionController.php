@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use App\Models\Prompt\PromptCategory;
 use App\Models\Submission\Submission;
 use App\Models\Item\Item;
+use App\Models\Award\Award;
+use App\Models\Award\AwardCategory;
 use App\Models\Item\ItemCategory;
 use App\Models\Currency\Currency;
 use App\Models\Loot\LootTable;
@@ -66,6 +68,7 @@ class SubmissionController extends Controller
         if(!$submission) abort(404);
         return view('admin.submissions.submission', [
             'submission' => $submission,
+            'awardsrow' => Award::all()->keyBy('id'),
             'inventory' => $inventory,
             'rewardsData' => isset($submission->data['rewards']) ? parseAssetData($submission->data['rewards']) : null,
             'itemsrow' => Item::all()->keyBy('id'),
@@ -73,6 +76,7 @@ class SubmissionController extends Controller
         ] + ($submission->status == 'Pending' ? [
             'characterCurrencies' => Currency::where('is_character_owned', 1)->orderBy('sort_character', 'DESC')->pluck('name', 'id'),
             'items' => Item::orderBy('name')->pluck('name', 'id'),
+            'awards' => Award::orderBy('name')->pluck('name', 'id'),
             'currencies' => Currency::where('is_user_owned', 1)->orderBy('name')->pluck('name', 'id'),
             'tables' => LootTable::orderBy('name')->pluck('name', 'id'),
             'raffles' => Raffle::where('rolled_at', null)->where('is_active', 1)->orderBy('name')->pluck('name', 'id'),
@@ -121,11 +125,13 @@ class SubmissionController extends Controller
         if(!$submission) abort(404);
         return view('admin.submissions.submission', [
             'submission' => $submission,
+            'awardsrow' => Award::all()->keyBy('id'),
             'inventory' => $inventory,
             'itemsrow' => Item::all()->keyBy('id'),
         ] + ($submission->status == 'Pending' ? [
             'characterCurrencies' => Currency::where('is_character_owned', 1)->orderBy('sort_character', 'DESC')->pluck('name', 'id'),
             'items' => Item::orderBy('name')->pluck('name', 'id'),
+            'awards' => Award::orderBy('name')->pluck('name', 'id'),
             'currencies' => Currency::where('is_user_owned', 1)->orderBy('name')->pluck('name', 'id'),
             'tables' => LootTable::orderBy('name')->pluck('name', 'id'),
             'raffles' => Raffle::where('rolled_at', null)->where('is_active', 1)->orderBy('name')->pluck('name', 'id'),

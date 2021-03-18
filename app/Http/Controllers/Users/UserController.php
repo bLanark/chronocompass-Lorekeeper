@@ -18,9 +18,15 @@ use App\Models\Gallery\GallerySubmission;
 use App\Models\User\UserItem;
 use App\Models\Item\Item;
 use App\Models\Item\ItemCategory;
+use App\Models\Item\ItemLog;
+
+use App\Models\User\UserAward;
+use App\Models\Award\Award;
+use App\Models\Award\AwardCategory;
+use App\Models\Award\AwardLog;
+
 use App\Models\Gallery\GalleryFavorite;
 use App\Models\Gallery\GalleryCharacter;
-use App\Models\Item\ItemLog;
 
 use App\Models\Character\CharacterCategory;
 use App\Models\Character\CharacterImage;
@@ -70,6 +76,7 @@ class UserController extends Controller
             'user' => $this->user,
             'items' => $this->user->items()->where('count', '>', 0)->orderBy('user_items.updated_at', 'DESC')->take(4)->get(),
             'sublists' => Sublist::orderBy('sort', 'DESC')->get(),
+            'awards' => $this->user->awards()->orderBy('user_awards.updated_at', 'DESC')->take(4)->get(),
             'characters' => $characters,
         ]);
     }
@@ -190,6 +197,39 @@ class UserController extends Controller
             'sublists' => Sublist::orderBy('sort', 'DESC')->get()
         ]);
     }
+    
+    /**
+     * Shows a user's award case.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function getUserAwardCase($name)
+    {
+        $categories = AwardCategory::orderBy('sort', 'DESC')->get();
+        $awards = count($categories) ? 
+            $this->user->awards()
+                ->where('count', '>', 0)
+                ->orderByRaw('FIELD(award_category_id,'.implode(',', $categories->pluck('id')->toArray()).')')
+                ->orderBy('name')
+                ->orderBy('updated_at')
+                ->get()
+                ->groupBy(['award_category_id', 'id']) :
+            $this->user->awards()
+                ->where('count', '>', 0)
+                ->orderBy('name')
+                ->orderBy('updated_at')
+                ->get()
+                ->groupBy(['award_category_id', 'id']);
+        return view('user.awardcase', [
+            'user' => $this->user,
+            'categories' => $categories->keyBy('id'),
+            'awards' => $awards,
+            'userOptions' => User::where('id', '!=', $this->user->id)->orderBy('name')->pluck('name', 'id')->toArray(),
+            'user' => $this->user,
+            'logs' => $this->user->getAwardLogs()
+        ]);
+    }
 
     /**
      * Shows a user's profile.
@@ -239,6 +279,21 @@ class UserController extends Controller
             'user' => $this->user,
             'logs' => $this->user->getItemLogs(0),
             'sublists' => Sublist::orderBy('sort', 'DESC')->get()
+        ]);
+    }
+    
+    /**
+     * Shows a user's award logs.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function getUserAwardLogs($name)
+    {
+        $user = $this->user;
+        return view('user.award_logs', [
+            'user' => $this->user,
+            'logs' => $this->user->getAwardLogs(0)
         ]);
     }
 

@@ -9,6 +9,12 @@ use Auth;
 use Settings;
 use App\Models\User\User;
 use App\Models\User\UserItem;
+use App\Models\User\UserAward;
+use App\Models\Character\Character;
+use App\Models\Item\Item;
+use App\Models\Item\ItemCategory;
+use App\Models\Award\Award;
+use App\Models\Award\AwardCategory;
 use App\Models\Character\Character;
 use App\Models\Item\Item;
 use App\Models\Raffle\Raffle;
@@ -75,7 +81,8 @@ class SubmissionController extends Controller
             'user' => $submission->user,
             'categories' => ItemCategory::orderBy('sort', 'DESC')->get(),
             'inventory' => $inventory,
-            'itemsrow' => Item::all()->keyBy('id')
+            'itemsrow' => Item::all()->keyBy('id'),
+            'awardsrow' => Award::all()->keyBy('id')
         ]);
     }
 
@@ -88,6 +95,7 @@ class SubmissionController extends Controller
     public function getNewSubmission(Request $request)
     {
         $closed = !Settings::get('is_prompts_open');
+        $awardcase = UserAward::with('award')->whereNull('deleted_at')->where('count', '>', '0')->where('user_id', Auth::user()->id)->get();
         $inventory = UserItem::with('item')->whereNull('deleted_at')->where('count', '>', '0')->where('user_id', Auth::user()->id)->get();
         return view('home.create_submission', [
             'closed' => $closed,
@@ -101,7 +109,8 @@ class SubmissionController extends Controller
             'items' => Item::orderBy('name')->released()->pluck('name', 'id'),
             'currencies' => Currency::where('is_user_owned', 1)->orderBy('name')->pluck('name', 'id'),
             'inventory' => $inventory,
-            'page' => 'submission'
+            'page' => 'submission',
+            'awards' => Award::orderBy('name')->pluck('name', 'id')
         ]));
     }
 
@@ -198,7 +207,9 @@ class SubmissionController extends Controller
             'user' => $submission->user,
             'categories' => ItemCategory::orderBy('sort', 'DESC')->get(),
             'itemsrow' => Item::all()->keyBy('id'),
-            'inventory' => $inventory
+            'inventory' => $inventory,
+            'awardsrow' => Award::all()->keyBy('id')
+
         ]);
     }
 
@@ -224,7 +235,8 @@ class SubmissionController extends Controller
             'items' => Item::orderBy('name')->released()->pluck('name', 'id'),
             'currencies' => Currency::where('is_user_owned', 1)->orderBy('name')->pluck('name', 'id'),
             'raffles' => Raffle::where('rolled_at', null)->where('is_active', 1)->orderBy('name')->pluck('name', 'id'),
-            'page' => 'submission'
+            'page' => 'submission',
+            'awards' => Award::orderBy('name')->pluck('name', 'id')
         ]));
     }
 

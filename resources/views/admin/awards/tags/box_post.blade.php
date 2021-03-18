@@ -1,0 +1,1 @@
+@include('widgets._loot_select_row', ['awards' => $awards, 'currencies' => $currencies, 'showLootTables' => true])

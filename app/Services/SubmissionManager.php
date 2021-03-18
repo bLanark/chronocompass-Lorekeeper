@@ -13,11 +13,13 @@ use Settings;
 use Illuminate\Support\Arr;
 use App\Models\User\User;
 use App\Models\User\UserItem;
+use App\Models\User\UserAward;
 use App\Models\Character\Character;
 use App\Models\Submission\Submission;
 use App\Models\Submission\SubmissionCharacter;
 use App\Models\Currency\Currency;
 use App\Models\Item\Item;
+use App\Models\Award\Award;
 use App\Models\Loot\LootTable;
 use App\Models\Raffle\Raffle;
 use App\Models\Prompt\Prompt;
@@ -198,6 +200,9 @@ class SubmissionManager extends Service
                         case 'Currency':
                             $reward = Currency::find($data['rewardable_id'][$key]);
                             if(!$reward->is_user_owned) throw new \Exception("Invalid currency selected.");
+                            break;
+                        case 'Award':
+                            $reward = Award::find($data['rewardable_id'][$key]);
                             break;
                         case 'LootTable':
                             if (!$isStaff) break;

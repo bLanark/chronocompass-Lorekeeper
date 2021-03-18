@@ -56,7 +56,7 @@
     {!! Form::open(['url' => url()->current(), 'id' => 'submissionForm']) !!}
 
         <h2>Rewards</h2>
-        @include('widgets._loot_select', ['loots' => $submission->rewards, 'showLootTables' => true, 'showRaffles' => true])
+        @include('widgets._loot_select', ['loots' => $submission->rewards, 'showLootTables' => true, 'showRaffles' => true, 'showRecipes' => true])
         @if($submission->prompt_id)
             <div class="mb-3">
                 @include('home._prompt', ['prompt' => $submission->prompt, 'staffView' => true])
@@ -179,8 +179,7 @@
             </tr>
         </table>
     </div>
-    @include('widgets._loot_select_row', ['items' => $items, 'currencies' => $currencies, 'awards' => $awards, 'showLootTables' => true, 'showRaffles' => true])
-
+    @include('widgets._loot_select_row', ['items' => $items, 'currencies' => $currencies, 'awards' => $awards, 'showLootTables' => true, 'showRaffles' => true, 'showRecipes' => true])
     <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content hide" id="approvalContent">
@@ -219,7 +218,7 @@
 @section('scripts')
 @parent 
 @if($submission->status == 'Pending')
-    @include('js._loot_js', ['showLootTables' => true, 'showRaffles' => true])
+    @include('js._loot_js', ['showLootTables' => true, 'showRaffles' => true, 'showRecipes' => true])
     @include('js._character_select_js')
 
     <script>

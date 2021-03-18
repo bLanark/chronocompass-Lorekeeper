@@ -19,5 +19,7 @@
         <div class="sidebar-section-header">Awards</div>
         <div class="sidebar-item"><a href="{{ url('world/award-categories') }}" class="{{ set_active('world/award-categories*') }}">Award Categories</a></div>
         <div class="sidebar-item"><a href="{{ url('world/awards') }}" class="{{ set_active('world/awards*') }}">All Awards</a></div>
+        <div class="sidebar-section-header">Recipes</div>
+        <div class="sidebar-item"><a href="{{ url('world/recipes') }}" class="{{ set_active('world/recipes*') }}">All Recipes</a></div>
     </li>
 </ul>

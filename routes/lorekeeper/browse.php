@@ -199,6 +199,7 @@ Route::group(['prefix' => 'affiliates'], function() {
     Route::post('apply', 'AffiliateController@postApply')->name('post_apply_affiliate');
 });
 
+/*************************************************************************************************
     World Expansion
 **************************************************************************************************/
 

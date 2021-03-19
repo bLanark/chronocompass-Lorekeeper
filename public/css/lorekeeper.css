@@ -637,3 +637,6 @@ tr.accountbound {
 
 .overflow-auto {overflow:auto;}
 
+@media (min-width: 768px) {
+    .fb-md-50 { flex-basis:50%; }
+}

@@ -1439,6 +1439,9 @@ class CharacterManager extends Service
 
             if(!$character->is_myo_slot && Config::get('lorekeeper.extensions.character_TH_profile_link')) $character->profile->link = $data['link'];
             $character->profile->save();
+            // Update the character's location
+            if(isset($data['location']) && $data['location']) $character->home_id = $data['location'];
+            $character->save();
 
             $character->profile->text = $data['text'];
             $character->profile->parsed_text = parse($data['text']);

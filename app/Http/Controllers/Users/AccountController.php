@@ -7,10 +7,12 @@ use File;
 use Image;
 
 use App\Models\User\User;
+use Settings;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Notification;
+use App\Models\WorldExpansion\Location;
 
 use App\Services\UserService;
 
@@ -47,7 +49,21 @@ class AccountController extends Controller
      */
     public function getSettings()
     {
-        return view('account.settings');
+        $interval = array(
+            0 => 'whenever',
+            1 => 'yearly',
+            2 => 'quarterly',
+            3 => 'monthly',
+            4 => 'weekly',
+            5 => 'daily'
+        );
+        
+        return view('account.settings',[
+            'locations' => Location::all()->where('is_user_home')->pluck('style','id')->toArray(),
+            'user_enabled' => Settings::get('WE_user_locations'),
+            'char_enabled' => Settings::get('WE_character_locations'),
+            'location_interval' => $interval[Settings::get('WE_change_timelimit')]
+        ]);
     }
     
     /**
@@ -76,6 +92,23 @@ class AccountController extends Controller
     {
         if($service->updateAvatar($request->file('avatar'), Auth::user())) {
             flash('Avatar updated successfully.')->success();
+        }
+        else {
+            foreach($service->errors()->getMessages()['error'] as $error) flash($error)->error();
+        }
+        return redirect()->back();
+    }
+    
+    /**
+     * Edits the user's location from a list of locations that users can make their home.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function postLocation(Request $request, UserService $service)
+    {
+        if($service->updateLocation($request->input('location'), Auth::user())) {
+            flash('Location updated successfully.')->success();
         }
         else {
             foreach($service->errors()->getMessages()['error'] as $error) flash($error)->error();

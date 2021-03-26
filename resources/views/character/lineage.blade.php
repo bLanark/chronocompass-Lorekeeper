@@ -19,15 +19,15 @@
             "Great-Grandchildren" => $greatGrandchildren,
         ];
     ?>
-    @foreach ($descendants as $typeOf => $children)
+    @foreach ($descendants as $typeOf => $descendant)
         <h3>
             <a href="{{ $character->url.'/'.strtolower($typeOf) }}">{{ $typeOf }}</a>
         </h3>
-        @if(!$children || count($children) == 0)
+        @if(!$descendant || count($descendant) == 0)
             <p>Doesn't have any {{ $typeOf }}.</p>
         @else
             <div class="row mb-4">
-                @foreach($children as $child)
+                @foreach($descendant as $child)
                     <div class="col-md-3 col-6 text-center">
                         <div>
                             <a href="{{ $child->url }}"><img src="{{ $child->image->thumbnailUrl }}" class="img-thumbnail" /></a>

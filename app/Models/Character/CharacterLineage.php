@@ -2,6 +2,8 @@
 
 namespace App\Models\Character;
 
+use Auth;
+
 use App\Models\Model;
 
 use App\Models\Character\Character;
@@ -122,10 +124,10 @@ class CharacterLineage extends Model
      */
     public function getDisplayName($ancestor)
     {
-        if(isset($this[$ancestor.'_id']))
+        if(isset($this[$ancestor.'_id']) && $this[$ancestor])
             return $this[$ancestor]->getDisplayNameAttribute();
 
-        if(isset($this[$ancestor.'_name']))
+        if(isset($this[$ancestor.'_name']) && $this[$ancestor.'_name'])
             return $this[$ancestor.'_name'];
 
         return "Unknown";
@@ -138,7 +140,7 @@ class CharacterLineage extends Model
      */
     public function getChildren($limit = false)
     {
-        return getChildrenStatic($this->character_id, $limit);
+        return CharacterLineage::getChildrenStatic($this->character_id, $limit);
     }
 
     /**
@@ -148,7 +150,7 @@ class CharacterLineage extends Model
      */
     public function getGrandchildren($limit = false)
     {
-        return getGrandchildrenStatic($this->character_id, $limit);
+        return CharacterLineage::getGrandchildrenStatic($this->character_id, $limit);
     }
 
     /**
@@ -158,7 +160,7 @@ class CharacterLineage extends Model
      */
     public function getGreatGrandchildren($limit = false)
     {
-        return getGrandchildrenStatic($this->character_id, $limit);
+        return CharacterLineage::getGreatGrandchildrenStatic($this->character_id, $limit);
     }
 
     /**
@@ -166,15 +168,12 @@ class CharacterLineage extends Model
      *
      * @return array
      */
-    public static function getChildrenStatic($id, $limit = true)
+    public static function getChildrenStatic($id, $limit = false)
     {
-        $children_ids = CharacterLineage::where('sire_id', $id)->orWhere('dam_id', $id)->get()->pluck('character_id');
-        if(count($children_ids) == 0 || $children_ids == null) return null;
-
-        $children = CharacterLineage::getFilteredDescendants($children_ids);
-        if($limit) $children->take(4);
-
-        return $children->get();
+        // Get the id numbers of the children.
+        $ids = CharacterLineage::where('sire_id', $id)->orWhere('dam_id', $id)
+                ->pluck('character_id')->toArray();
+        return CharacterLineage::filterDescendants($ids, $limit);
     }
 
     /**
@@ -182,19 +181,15 @@ class CharacterLineage extends Model
      *
      * @return array
      */
-    public static function getGrandchildrenStatic($id, $limit = true)
+    public static function getGrandchildrenStatic($id, $limit = false)
     {
-        $children_ids = CharacterLineage::where('sire_sire_id', $id)
-            ->orWhere('sire_dam_id', $id)
-            ->orWhere('dam_sire_id', $id)
-            ->orWhere('dam_dam_id', $id)
-            ->get()->pluck('character_id');
-        if(count($children_ids) == 0 || $children_ids == null) return null;
-
-        $children = CharacterLineage::getFilteredDescendants($children_ids);
-        if($limit) $children->take(4);
-
-        return $children->get();
+        // Get the id numbers of the children.
+        $ids = CharacterLineage::where('sire_sire_id', $id)
+                ->orWhere('sire_dam_id', $id)
+                ->orWhere('dam_sire_id', $id)
+                ->orWhere('dam_dam_id', $id)
+                ->pluck('character_id')->toArray();
+        return CharacterLineage::filterDescendants($ids, $limit);
     }
 
     /**
@@ -202,23 +197,19 @@ class CharacterLineage extends Model
      *
      * @return array
      */
-    public static function getGreatGrandchildrenStatic($id, $limit = true)
+    public static function getGreatGrandchildrenStatic($id, $limit = false)
     {
-        $children_ids = CharacterLineage::where('sire_sire_sire_id', $id)
-            ->orWhere('sire_sire_dam_id', $id)
-            ->orWhere('sire_dam_sire_id', $id)
-            ->orWhere('sire_dam_dam_id', $id)
-            ->orWhere('dam_sire_sire_id', $id)
-            ->orWhere('dam_sire_dam_id', $id)
-            ->orWhere('dam_dam_sire_id', $id)
-            ->orWhere('dam_dam_dam_id', $id)
-            ->get()->pluck('character_id');
-        if(count($children_ids) == 0 || $children_ids == null) return null;
-
-        $children = CharacterLineage::getFilteredDescendants($children_ids);
-        if($limit) $children->take(4);
-
-        return $children->get();
+        // Get the id numbers of the children.
+        $ids = CharacterLineage::where('sire_sire_sire_id', $id)
+                ->orWhere('sire_sire_dam_id', $id)
+                ->orWhere('sire_dam_sire_id', $id)
+                ->orWhere('sire_dam_dam_id', $id)
+                ->orWhere('dam_sire_sire_id', $id)
+                ->orWhere('dam_sire_dam_id', $id)
+                ->orWhere('dam_dam_sire_id', $id)
+                ->orWhere('dam_dam_dam_id', $id)
+                ->pluck('character_id')->toArray();
+        return CharacterLineage::filterDescendants($ids, $limit);
     }
 
     /**
@@ -245,5 +236,25 @@ class CharacterLineage extends Model
                       ->orWhereNotIn('subtype_id', CharacterLineageBlacklist::getBlacklistSubtypes(true));
             })
             ->orderBy('is_myo_slot', 'asc');
+    }
+
+    /**
+     * Gets filtered descendents from id array
+     *
+     * @return array
+     */
+    public static function filterDescendants($ids, $limit)
+    {
+        // If null or 0, return null.
+        if ($ids == null || count($ids) < 1) return null;
+
+        // Find characters matching those ids.
+        $children = Character::whereIn('id', $ids);
+        if(!Auth::check() || !(Auth::check() && Auth::user()->hasPower('manage_characters'))) $children->where('is_visible', true);
+
+        // Sort, limit and return.
+        $children->orderBy('is_myo_slot', 'asc')->orderBy('id', 'desc');
+        if($limit) $children->limit(4);
+        return $children->get();
     }
 }

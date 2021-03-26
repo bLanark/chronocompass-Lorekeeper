@@ -67,15 +67,13 @@ class CharacterLineageController extends Controller
         if($this->character->getLineageBlacklistLevel() > 0) abort(404);
 
         $hasLineage = $this->character->lineage !== null;
-        $line = $this->character->lineage;
         return view('character.lineage', [
             'character' => $this->character,
             'hasLineage' => $hasLineage,
-            'lineage' => $line,
-            // TODO separate function for ancestors with no lineages
-            'children' => $isMyo ? null : CharacterLineage::getChildrenStatic($this->character->id),
-            'grandchildren' => $isMyo ? null : CharacterLineage::getGrandchildrenStatic($this->character->id),
-            'greatGrandchildren' => $isMyo ? null : CharacterLineage::getGreatGrandchildrenStatic($this->character->id),
+            'lineage' => $this->character->lineage,
+            'children' => CharacterLineage::getChildrenStatic($this->character->id, true),
+            'grandchildren' => CharacterLineage::getGrandchildrenStatic($this->character->id, true),
+            'greatGrandchildren' => CharacterLineage::getGreatGrandchildrenStatic($this->character->id, true),
             'isMyo' => $isMyo,
         ]);
     }

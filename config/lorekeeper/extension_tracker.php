@@ -46,7 +46,7 @@ return [
         ]),
         'version' => '1.1.0',
     ],
-    'extension_tracker' => [
+    'character_links' => [
 	'key' => 'character_links',
 	'wiki_key' => 'Character_Links',
 	'creators' => json_encode([
@@ -54,7 +54,7 @@ return [
 	]),
 	'version' => '1.0.0',
     ],
-    'extension_tracker' => [
+    'character_lineages' => [
 	'key' => 'character_lineages',
 	'wiki_key' => 'Character_Lineages',
 	'creators' => json_encode([
@@ -63,7 +63,7 @@ return [
 	]),
 	'version' => '1.0.0',
     ],
-    'extension_tracker' => [
+    'trade_listings' => [
 	'key' => 'trade_listings',
 	'wiki_key' => 'Trade_Listings',
 	'creators' => json_encode([
@@ -71,7 +71,7 @@ return [
 	]),
 	'version' => '1.0.0',
     ],
-    'extension_tracker' => [
+    'world_expansion' => [
 	'key' => 'world_expansion',
 	'wiki_key' => 'World_Expansion',
 	'creators' => json_encode([
@@ -79,7 +79,7 @@ return [
 	]),
 	'version' => '1.0.0',
     ],
-    'extension_tracker' => [
+    'organized_trait_dropdown' => [
 	'key' => 'organized_trait_dropdown',
 	'wiki_key' => 'Organized_Trait_Dropdown',
 	'creators' => json_encode([
@@ -87,7 +87,7 @@ return [
 	]),
 	'version' => '1.0.0',
     ],
-    'extension_tracker' => [
+    'page_catagories' => [
 	'key' => 'page_categories',
 	'wiki_key' => 'Page_Categories',
 	'creators' => json_encode([
@@ -95,7 +95,7 @@ return [
 	]),
 	'version' => '1.0.0',
     ],
-    'extension_tracker' => [
+    'oldest_sorting' => [
 	'key' => 'oldest_sorting',
 	'wiki_key' => 'Oldest_Sorting',
 	'creators' => json_encode([

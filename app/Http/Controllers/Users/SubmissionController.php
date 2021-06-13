@@ -110,11 +110,8 @@ class SubmissionController extends Controller
             'currencies' => Currency::where('is_user_owned', 1)->orderBy('name')->pluck('name', 'id'),
             'inventory' => $inventory,
             'page' => 'submission',
-<<<<<<< HEAD
-            'awards' => Award::orderBy('name')->pluck('name', 'id')
-=======
+            'awards' => Award::orderBy('name')->pluck('name', 'id'),
             'expanded_rewards' => Config::get('lorekeeper.extensions.character_reward_expansion.expanded')
->>>>>>> lore/master
         ]));
     }
 

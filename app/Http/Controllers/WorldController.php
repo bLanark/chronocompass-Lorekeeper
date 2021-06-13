@@ -373,7 +373,7 @@ class WorldController extends Controller
             'items' => $query->paginate(20)->appends($request->query()),
             'categories' => ['none' => 'Any Category'] + ItemCategory::orderBy('sort', 'DESC')->pluck('name', 'id')->toArray(),
             'sections' => SitePageSection::orderBy('sort', 'DESC')->get()
-
+        ]
         return view('world.awards', [
             'awards' => $query->paginate(20)->appends($request->query()),
             'categories' => ['none' => 'Any Category'] + AwardCategory::orderBy('sort', 'DESC')->pluck('name', 'id')->toArray(),

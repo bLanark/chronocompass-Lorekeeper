@@ -85,6 +85,7 @@ class CommentController extends Controller implements CommentControllerInterface
 
         $recipient = null;
         $post = null;
+        $link = null;
         $model_type = $comment->commentable_type;
         //getting user who commented
         $sender = User::find($comment->commenter_id);

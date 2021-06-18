@@ -195,14 +195,10 @@ class DesignController extends Controller
 
         return view('character.design.features', [
             'request' => $r,
-            'userOptions' => User::query()->orderBy('name')->pluck('name', 'id')->toArray(),
             'specieses' => ['0' => 'Select Species'] + Species::orderBy('sort', 'DESC')->pluck('name', 'id')->toArray(),
             'subtypes' => ['0' => 'No Subtype'] + Subtype::where('species_id','=',$r->species_id)->orderBy('sort', 'DESC')->pluck('name', 'id')->toArray(),
             'rarities' => ['0' => 'Select Rarity'] + Rarity::orderBy('sort', 'DESC')->pluck('name', 'id')->toArray(),
-            'features' => Feature::orderBy('name')->pluck('name', 'id')->toArray(),
-            'isMyo' => true,
-            'characterOptions' => [null => 'Unbound'] + Character::visible()->myo(0)->orderBy('slug','ASC')->get()->pluck('fullName','id')->toArray(),
-            'features' => Feature::getFeaturesByCategory(),
+            'features' => Feature::getFeaturesByCategory()
         ]);
     }
 

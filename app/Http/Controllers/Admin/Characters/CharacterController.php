@@ -87,7 +87,6 @@ class CharacterController extends Controller
             'isMyo' => true,
             'characterOptions' => [null => 'Unbound'] + Character::visible()->myo(0)->orderBy('slug','ASC')->get()->pluck('fullName','id')->toArray(),
             'features' => Feature::getFeaturesByCategory(),
-            'isMyo' => true
         ]);
     }
 

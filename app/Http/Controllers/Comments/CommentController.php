@@ -135,6 +135,11 @@ class CommentController extends Controller implements CommentControllerInterface
                 $post = 'your trade listing';
                 $link = $listing->url . '/#comment-' . $comment->getKey();
                 break;
+            case 'App\Models\Character':
+                $recipient = User::find($comment->commentable_id);
+                $post = 'your character';
+                $link = $recipient->url . '/#comment-' . $comment->getKey();
+                break;                
             }
 
         if($recipient != $sender) {
